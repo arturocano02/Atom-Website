@@ -388,27 +388,60 @@ export function PatentConstellationHero() {
 
   // Auto spotlight cycle
   useEffect(() => {
-    if (prefersReducedMotion || !canStartSpotlight) return;
+    console.log('=== SPOTLIGHT CYCLE DEBUG ===');
+    console.log('Spotlight useEffect triggered:', {
+      prefersReducedMotion,
+      canStartSpotlight,
+      hoveredNode,
+      nodesCount: nodesRef.current.length
+    });
+    
+    if (prefersReducedMotion || !canStartSpotlight) {
+      console.log('Spotlight cycle blocked:', { prefersReducedMotion, canStartSpotlight });
+      return;
+    }
 
     let timeoutId: number;
     let animationId: number;
 
     const runSpotlight = () => {
+      console.log('=== RUNSPOTLIGHT CALLED ===');
+      console.log('Current state:', {
+        hoveredNode,
+        nodesCount: nodesRef.current.length,
+        displayTitle,
+        spotlightState
+      });
+      
       // Pause if hovering
       if (hoveredNode !== null) {
+        console.log('Paused due to hover, retrying in 100ms');
         timeoutId = window.setTimeout(runSpotlight, 100);
         return;
       }
 
       // Use all nodes for spotlight selection
       const visibleNodes = nodesRef.current;
+      console.log('Available nodes:', visibleNodes.length);
       
       if (visibleNodes.length === 0) {
+        console.log('No nodes available, retrying in 100ms');
         timeoutId = window.setTimeout(runSpotlight, 100);
         return;
       }
 
       const node = visibleNodes[Math.floor(Math.random() * visibleNodes.length)];
+      console.log('=== SELECTED NODE FOR SPOTLIGHT ===');
+      console.log('Selected node:', {
+        id: node.id,
+        title: node.title,
+        titleLength: node.title?.length || 0,
+        hasTitle: !!node.title,
+        x: node.x,
+        y: node.y
+      });
+      
+      console.log('Setting spotlight state and display title...');
       setSpotlightState({ nodeId: node.id, progress: 0 });
       setDisplayTitle(node.title);
 
@@ -419,24 +452,29 @@ export function PatentConstellationHero() {
         const elapsed = timestamp - startTime;
         const progress = Math.min(elapsed / 300, 1);
         
+        console.log('Animate in progress:', progress, 'for node:', node.id);
         setSpotlightState({ nodeId: node.id, progress });
         
         if (progress < 1) {
           animationId = requestAnimationFrame(animateIn);
         } else {
+          console.log('Animate in complete, holding for 2s...');
           // Hold for 2s then animate out
           timeoutId = window.setTimeout(() => {
+            console.log('Starting animate out...');
             let startTimeOut: number | null = null;
             const animateOut = (timestamp: number) => {
               if (!startTimeOut) startTimeOut = timestamp;
               const elapsed = timestamp - startTimeOut;
               const progress = Math.max(1 - elapsed / 200, 0);
               
+              console.log('Animate out progress:', progress, 'for node:', node.id);
               setSpotlightState({ nodeId: node.id, progress });
               
               if (progress > 0) {
                 animationId = requestAnimationFrame(animateOut);
               } else {
+                console.log('Animate out complete, clearing title and waiting...');
                 setSpotlightState({ nodeId: null, progress: 0 });
                 setDisplayTitle('');
                 // Wait before next spotlight
@@ -447,6 +485,7 @@ export function PatentConstellationHero() {
           }, 2000);
         }
       };
+      console.log('Starting animate in for node:', node.id);
       animationId = requestAnimationFrame(animateIn);
     };
 
@@ -548,9 +587,72 @@ export function PatentConstellationHero() {
     };
   }, [animate, initializeNodes]);
 
-  // Clean visibility calculation
+  // COMPREHENSIVE DEBUG LOGGING FOR PATENT TITLES
+  console.log('=== PATENT TITLES DEBUG ===');
+  console.log('Component state:', {
+    canStartSpotlight,
+    spotlightState,
+    displayTitle,
+    isGraphVisible,
+    hoveredNode,
+    nodesCount: nodesRef.current.length,
+    edgesCount: edgesRef.current.length
+  });
+  
+  // Debug nodes array
+  if (nodesRef.current.length > 0) {
+    console.log('First 3 nodes with titles:', nodesRef.current.slice(0, 3).map(n => ({
+      id: n.id,
+      title: n.title,
+      x: n.x,
+      y: n.y,
+      hasTitle: !!n.title,
+      titleLength: n.title?.length || 0
+    })));
+  }
+  
+  // Debug visibility calculation
   const isVisible = (hoveredNode !== null || spotlightState.progress > 0) && displayTitle && displayTitle.length > 0;
   const opacity = hoveredNode !== null ? 1 : spotlightState.progress;
+  
+  console.log('Visibility calculation:', {
+    isVisible,
+    opacity,
+    hoveredNode,
+    spotlightProgress: spotlightState.progress,
+    displayTitleLength: displayTitle?.length || 0,
+    displayTitleExists: !!displayTitle,
+    displayTitleValue: displayTitle
+  });
+  
+  // Debug useEffect triggers
+  useEffect(() => {
+    console.log('=== USEEFFECT DEBUG ===');
+    console.log('Spotlight cycle useEffect triggered:', {
+      canStartSpotlight,
+      hoveredNode,
+      spotlightState,
+      nodesCount: nodesRef.current.length
+    });
+  }, [canStartSpotlight, hoveredNode, spotlightState]);
+  
+  // Debug display title changes
+  useEffect(() => {
+    console.log('Display title changed:', {
+      newTitle: displayTitle,
+      titleLength: displayTitle?.length || 0,
+      hasTitle: !!displayTitle
+    });
+  }, [displayTitle]);
+  
+  // Debug spotlight state changes
+  useEffect(() => {
+    console.log('Spotlight state changed:', {
+      nodeId: spotlightState.nodeId,
+      progress: spotlightState.progress,
+      hasNodeId: spotlightState.nodeId !== null
+    });
+  }, [spotlightState]);
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
@@ -567,16 +669,34 @@ export function PatentConstellationHero() {
       {displayTitle && (
         <div 
           className="absolute top-32 left-4 right-4 flex items-center justify-center pointer-events-none transition-opacity duration-300 z-10 px-4"
-          style={{ opacity: isVisible ? opacity : 0 }}
+          style={{ 
+            opacity: isVisible ? opacity : 0,
+            backgroundColor: 'rgba(255, 0, 0, 0.2)', // Red background for debugging
+            border: '2px solid red' // Red border for debugging
+          }}
         >
           <div className="px-4 py-3 rounded-lg shadow-lg backdrop-blur-xl bg-white/90 border border-white/20 text-[rgb(15,23,42)] max-w-lg">
-            <p className="text-sm leading-relaxed font-medium">{displayTitle}</p>
+            <p className="text-sm leading-relaxed font-medium text-red-600">{displayTitle}</p>
             {hoveredNode !== null && (
               <p className="text-xs text-[rgb(255,107,107)] mt-1">View details</p>
             )}
           </div>
         </div>
       )}
+      
+      {/* Debug info display */}
+      <div className="absolute top-4 left-4 bg-black/90 text-white p-3 rounded text-xs z-50 max-w-sm">
+        <div className="font-bold mb-2">PATENT TITLES DEBUG</div>
+        <div>Display Title: {displayTitle || 'NONE'}</div>
+        <div>Is Visible: {isVisible ? 'YES' : 'NO'}</div>
+        <div>Opacity: {opacity}</div>
+        <div>Spotlight Progress: {spotlightState.progress}</div>
+        <div>Hovered Node: {hoveredNode}</div>
+        <div>Nodes Count: {nodesRef.current.length}</div>
+        <div>Can Start Spotlight: {canStartSpotlight ? 'YES' : 'NO'}</div>
+        <div>Spotlight Node ID: {spotlightState.nodeId}</div>
+        <div>Display Title Length: {displayTitle?.length || 0}</div>
+      </div>
     </div>
   );
 }
