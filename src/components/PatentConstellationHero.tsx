@@ -161,6 +161,12 @@ export function PatentConstellationHero() {
 
     nodesRef.current = nodes;
     edgesRef.current = edges;
+
+    // Fallback: ensure we have an initial title to display even if
+    // spotlight animations are disabled (e.g., prefers-reduced-motion)
+    if (nodes.length > 0) {
+      setDisplayTitle(prev => prev || nodes[Math.floor(Math.random() * nodes.length)].title);
+    }
   }, []);
 
   const drawConnectorLine = (
@@ -548,9 +554,9 @@ export function PatentConstellationHero() {
     };
   }, [animate, initializeNodes]);
 
-  // Clean visibility calculation
-  const isVisible = (hoveredNode !== null || spotlightState.progress > 0) && displayTitle && displayTitle.length > 0;
-  const opacity = hoveredNode !== null ? 1 : spotlightState.progress;
+  // Title is visible whenever we have one; if no animation is active, show fully
+  const isVisible = !!displayTitle && displayTitle.length > 0;
+  const opacity = hoveredNode !== null ? 1 : (spotlightState.progress > 0 ? spotlightState.progress : 1);
 
   return (
     <div ref={containerRef} className="relative w-full h-full">
@@ -566,7 +572,7 @@ export function PatentConstellationHero() {
       {/* Patent title display - positioned to connect with line */}
       {displayTitle && (
         <div 
-          className="absolute top-32 left-4 right-4 flex items-center justify-center pointer-events-none transition-opacity duration-300 z-10 px-4"
+          className="absolute top-32 left-4 right-4 flex items-center justify-center pointer-events-none transition-opacity duration-300 z-20 px-4"
           style={{ opacity: isVisible ? opacity : 0 }}
         >
           <div className="px-4 py-3 rounded-lg shadow-lg backdrop-blur-xl bg-white/90 border border-white/20 text-[rgb(15,23,42)] max-w-lg">
