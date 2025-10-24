@@ -60,6 +60,7 @@ type TimelineProps = {
 
 export function Timeline({ loop = true }: TimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const stepRefs = useRef<HTMLDivElement[]>([]);
   const [activeStep, setActiveStep] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -78,26 +79,37 @@ export function Timeline({ loop = true }: TimelineProps) {
     return () => clearInterval(interval);
   }, [isHovered, loop]);
 
-  // Scroll to center the active step with smoother animation
+  // Scroll to center the active step precisely
   useEffect(() => {
-    if (containerRef.current) {
-      const stepWidth = 280; // approximate card width incl. gap
-      const containerWidth = containerRef.current.clientWidth;
-      const scrollPosition = (activeStep * stepWidth) - (containerWidth / 2) + (stepWidth / 2);
-      
-      containerRef.current.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
-    }
+    const el = stepRefs.current[activeStep];
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }, [activeStep]);
 
   const handleScroll = () => {
-    if (containerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = containerRef.current;
-      const progress = scrollLeft / (scrollWidth - clientWidth);
-      setScrollProgress(progress);
-    }
+    const container = containerRef.current;
+    if (!container) return;
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    const progress = scrollLeft / Math.max(1, scrollWidth - clientWidth);
+    setScrollProgress(progress);
+
+    // Determine which step is closest to the center of the viewport
+    const centerX = scrollLeft + clientWidth / 2;
+    let closestIdx = 0;
+    let closestDist = Infinity;
+    stepRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const elCenter = rect.left + window.scrollX + rect.width / 2; // page coords
+      const containerLeftOnPage = container.getBoundingClientRect().left + window.scrollX;
+      const elCenterInContainer = elCenter - containerLeftOnPage + scrollLeft;
+      const dist = Math.abs(elCenterInContainer - centerX);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestIdx = idx;
+      }
+    });
+    setActiveStep((prev) => (prev !== closestIdx ? closestIdx : prev));
   };
 
   const scrollLeft = () => {
@@ -132,6 +144,8 @@ export function Timeline({ loop = true }: TimelineProps) {
 
         {/* Timeline Container */}
         <div className="relative">
+          {/* Center guide line */}
+          <div className="hidden lg:block absolute top-0 bottom-12 left-1/2 -translate-x-1/2 w-px bg-[rgb(var(--foreground),0.08)] pointer-events-none z-10" />
           {/* Scroll Buttons */}
           <button
             onClick={scrollLeft}
@@ -153,17 +167,20 @@ export function Timeline({ loop = true }: TimelineProps) {
           <div
             ref={containerRef}
             onScroll={handleScroll}
-            className="overflow-x-auto pb-10 hide-scrollbar"
+            className="overflow-x-auto pb-10 hide-scrollbar snap-x snap-mandatory"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
             }}
           >
-            <div className="flex items-start gap-6 md:gap-10 min-w-max px-4 md:px-16 lg:px-20">
+            <div className="flex items-start gap-6 md:gap-10 min-w-max px-8 md:px-16 lg:px-24">
               {steps.map((step, index) => (
                 <motion.div
                   key={index}
-                  className="flex flex-col items-center relative cursor-pointer"
+                  ref={(el) => {
+                    if (el) stepRefs.current[index] = el;
+                  }}
+                  className="flex flex-col items-center relative cursor-pointer snap-center shrink-0 w-[300px]"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}

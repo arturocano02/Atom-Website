@@ -32,7 +32,7 @@ export function PrimaryButton({
   };
 
   const baseClasses =
-    'relative overflow-hidden px-8 py-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-xl';
+    'relative overflow-hidden px-8 py-4 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-xl';
 
   const variantClasses =
     variant === 'coral'
@@ -60,7 +60,7 @@ export function PrimaryButton({
       }}
     >
       {/* Glass reflection effect */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-lg pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent rounded-full pointer-events-none" />
       
       {/* Shimmer effect on hover */}
       <motion.div
