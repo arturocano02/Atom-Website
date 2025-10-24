@@ -6,6 +6,7 @@ import { StatsBand } from './components/StatsBand';
 import { Timeline } from './components/Timeline';
 import { LogosGrid } from './components/LogosGrid';
 import { PrivacySection } from './components/PrivacySection';
+import { InventorsSection } from './components/InventorsSection';
 import { TeamSection } from './components/TeamSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { ContactSection } from './components/ContactSection';
@@ -23,6 +24,7 @@ export default function App() {
           <StatsBand />
           <Timeline />
           <LogosGrid />
+          <InventorsSection />
           <PrivacySection />
           <TeamSection />
           <TestimonialsSection />
