@@ -88,8 +88,8 @@ export function Hero({ onAnimationComplete }: HeroProps = {}) {
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           {/* Left: Text content */}
           <div className="space-y-6 relative z-20">
-            {/* Typewriter headline - BOLD and BIGGER */}
-            <div className="min-h-[180px] md:min-h-[220px]">
+            {/* Typewriter headline - fixed height to prevent layout shift */}
+            <div className="min-h-[200px] md:min-h-[260px]">
               <h1 className="text-4xl md:text-5xl lg:text-7xl text-[rgb(var(--foreground))]" style={{ fontWeight: 700, lineHeight: 1.1 }}>
                 {displayedFirstLine}
                 {!firstLineComplete && <span className="animate-pulse">|</span>}

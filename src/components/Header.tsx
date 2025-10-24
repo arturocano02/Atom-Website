@@ -106,7 +106,7 @@ export function Header() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg backdrop-blur-xl bg-[rgba(var(--muted),0.5)] border border-[rgba(var(--foreground),0.1)] hover:bg-[rgba(var(--muted),0.8)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2"
+            className="lg:hidden p-2 rounded-full backdrop-blur-xl bg-[rgba(var(--muted),0.5)] border border-[rgba(var(--foreground),0.1)] hover:bg-[rgba(var(--muted),0.8)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2"
             aria-label="Toggle mobile menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -119,7 +119,7 @@ export function Header() {
 
           <button
             onClick={toggleDarkMode}
-            className="p-2 rounded-lg backdrop-blur-xl bg-[rgba(var(--muted),0.5)] border border-[rgba(var(--foreground),0.1)] hover:bg-[rgba(var(--muted),0.8)] hover:shadow-[0_4px_24px_0_rgba(var(--accent),0.2)] transition-all duration-200 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2"
+            className="p-2 rounded-full backdrop-blur-xl bg-[rgba(var(--muted),0.5)] border border-[rgba(var(--foreground),0.1)] hover:bg-[rgba(var(--muted),0.8)] hover:shadow-[0_4px_24px_0_rgba(var(--accent),0.2)] transition-all duration-200 relative overflow-hidden group focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2"
             aria-label="Toggle dark mode"
           >
             {/* Glass reflection */}
@@ -161,7 +161,7 @@ export function Header() {
                     <a
                       href="#contact"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(255,107,107,0.8)] text-white px-6 py-4 rounded-xl text-lg font-semibold hover:from-[rgb(255,107,107,0.9)] hover:to-[rgb(var(--accent))] hover:shadow-lg hover:shadow-[rgb(var(--accent),0.3)] hover:scale-105 transition-all duration-300 text-center mt-4 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2 relative overflow-hidden group"
+                      className="block bg-gradient-to-r from-[rgb(var(--accent))] to-[rgb(255,107,107,0.8)] text-white px-6 py-4 rounded-full text-lg font-semibold hover:from-[rgb(255,107,107,0.9)] hover:to-[rgb(var(--accent))] hover:shadow-lg hover:shadow-[rgb(var(--accent),0.3)] hover:scale-105 transition-all duration-300 text-center mt-4 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2 relative overflow-hidden group"
                     >
                       <span className="relative z-10">Contact Us</span>
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
