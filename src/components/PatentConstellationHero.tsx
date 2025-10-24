@@ -161,6 +161,12 @@ export function PatentConstellationHero() {
 
     nodesRef.current = nodes;
     edgesRef.current = edges;
+
+    // Fallback: ensure we have an initial title to display even if
+    // spotlight animations are disabled (e.g., prefers-reduced-motion)
+    if (nodes.length > 0) {
+      setDisplayTitle(prev => prev || nodes[Math.floor(Math.random() * nodes.length)].title);
+    }
   }, []);
 
   const drawConnectorLine = (
