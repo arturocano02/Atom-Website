@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Moon, Sun, Menu, X } from 'lucide-react';
 import { useDarkMode } from './DarkModeProvider';
+import { PrimaryButton } from './PrimaryButton';
 import atomLogo from 'figma:asset/e18042df5537cba0b4ef97cb84b1473577218359.png';
 
 export function Header() {
@@ -40,6 +41,13 @@ export function Header() {
       window.removeEventListener('keydown', handleEscape);
     };
   }, [mobileMenuOpen]);
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const navItems = [
     { label: 'Home', href: '#home' },
@@ -86,21 +94,15 @@ export function Header() {
                       {item.label}
                     </a>
                   ))}
-                  {/* Contact CTA Button - matches hero style */}
-                  <a
-                    href="#contact"
-                    className={`px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] focus:ring-offset-2 relative overflow-hidden group ${
-                      isOverDarkSection
-                        ? 'bg-[rgb(var(--accent))] text-white hover:bg-[rgb(var(--accent),0.9)] hover:shadow-lg hover:shadow-[rgb(var(--accent),0.3)] hover:scale-105'
-                        : 'bg-[rgb(var(--accent))] text-white hover:bg-[rgb(var(--accent),0.9)] hover:shadow-lg hover:shadow-[rgb(var(--accent),0.3)] hover:scale-105'
-                    }`}
-                  >
-                    <span className="relative z-10">Contact Us</span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
-                  </a>
                 </nav>
 
         <div className="flex items-center gap-4">
+          {/* Desktop Contact CTA on the far right */}
+          <div className="hidden lg:block">
+            <PrimaryButton variant="coral" onClick={scrollToContact}>
+              Contact Us
+            </PrimaryButton>
+          </div>
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
