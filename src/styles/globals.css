@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --background: 250 245 240; /* off-white */
+    --foreground: 15 23 42; /* deep navy */
+    --accent: 255 107 107; /* coral */
+    --muted: 241 245 249;
+    --border: 226 232 240;
+  }
+
+  .dark {
+    --background: 15 23 42; /* deep navy */
+    --foreground: 250 245 240; /* off-white */
+    --accent: 255 107 107; /* coral */
+    --muted: 30 41 59;
+    --border: 51 65 85;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-[rgb(var(--background))] text-[rgb(var(--foreground))];
+    transition: background-color 300ms ease, color 300ms ease;
+  }
+
+  h1 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+    letter-spacing: -0.03em;
+  }
+
+  h2 {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+    line-height: 1.7;
+  }
+
+  button {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro', system-ui, sans-serif;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
