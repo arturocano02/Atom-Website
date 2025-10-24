@@ -1,61 +1,87 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'motion/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ChevronLeft, ChevronRight, Video, Brain, Send, RefreshCcw, Lightbulb, Shield, Handshake } from 'lucide-react';
 
 interface TimelineStep {
   title: string;
   description: string;
-  detail: string;
+  detail?: string;
+  icon: React.ComponentType<{ className?: string }>;
 }
 
 const steps: TimelineStep[] = [
   {
-    title: 'Discovery Call',
-    description: 'We understand your innovation needs and strategic goals.',
-    detail: 'Quick consultation to identify your specific IP requirements and business challenges.'
+    title: 'Intro Call',
+    description: 'We start with a call to understand your needs and what kind of IP you’re looking for.',
+    detail: 'A short conversation to align on goals, timelines, and success criteria so we can tailor the search to you.',
+    icon: Video,
   },
   {
-    title: 'AI Search',
-    description: 'Our AI scans 150M+ patents to find breakthrough innovations.',
-    detail: 'Proprietary algorithms analyze millions of patents to identify the most relevant matches for your needs.'
+    title: 'AI-Powered Search',
+    description: 'We use our AI, trained on the world’s largest patent database, to scout options tailored to you.',
+    detail: 'Our AI analyzes 150M+ patents to surface highly relevant, high-potential candidates.',
+    icon: Brain,
   },
   {
-    title: 'Curated Results',
-    description: 'We deliver the best options with detailed analysis and feedback.',
-    detail: 'Receive hand-picked patent matches with comprehensive analysis and iterative refinement.'
+    title: 'Options Sent',
+    description: 'We send you the best patents we find, with clear reports.',
+    detail: 'You receive concise reports highlighting novelty, relevance, and potential fit.',
+    icon: Send,
   },
   {
-    title: 'Inventor Connection',
-    description: 'Direct introduction to inventors and researchers for technical discussions.',
-    detail: 'We facilitate high-level calls with inventors to explore technical fit and potential applications.'
+    title: 'Feedback & Iteration',
+    description: 'You give us feedback, we refine and iterate until we find the golden patent.',
+    detail: 'We quickly loop with you to sharpen direction and converge on the highest-value options.',
+    icon: RefreshCcw,
   },
   {
-    title: 'Deal Execution',
-    description: 'Secure pilot testing and final licensing agreement. Zero cost for companies.',
-    detail: 'Complete the licensing process with full legal support. Atom charges inventors, not companies.'
-  }
+    title: 'Inventor Call',
+    description: 'We connect you with inventors to explore synergies and fit.',
+    detail: 'Technical and commercial deep-dive with the inventors to validate feasibility and alignment.',
+    icon: Lightbulb,
+  },
+  {
+    title: 'NDA & Pilot',
+    description: 'Once there’s interest, you sign an NDA, share details, and explore pilots.',
+    detail: 'Deeper data and prototypes under NDA to evaluate integration and performance.',
+    icon: Shield,
+  },
+  {
+    title: 'Deal Closed',
+    description: 'If it works, you close the deal. The company pays nothing — we take a small success fee from the inventors.',
+    detail: 'We help finalize licensing terms. Companies pay zero; inventors pay a small success fee.',
+    icon: Handshake,
+  },
 ];
 
-export function Timeline() {
+type TimelineProps = {
+  loop?: boolean;
+};
+
+export function Timeline({ loop = true }: TimelineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
 
   useEffect(() => {
     if (isHovered) return; // Pause auto-scroll on hover
-    
+
     const interval = setInterval(() => {
-      setActiveStep((prev) => (prev + 1) % steps.length);
-    }, 3000); // Change every 3 seconds for faster pace
+      setActiveStep((prev) => {
+        if (loop) return (prev + 1) % steps.length;
+        return prev + 1 < steps.length ? prev + 1 : prev;
+      });
+    }, 3200);
 
     return () => clearInterval(interval);
-  }, [isHovered]);
+  }, [isHovered, loop]);
 
   // Scroll to center the active step with smoother animation
   useEffect(() => {
     if (containerRef.current) {
-      const stepWidth = 240; // Updated for smaller cards
+      const stepWidth = 280; // approximate card width incl. gap
       const containerWidth = containerRef.current.clientWidth;
       const scrollPosition = (activeStep * stepWidth) - (containerWidth / 2) + (stepWidth / 2);
       
@@ -97,10 +123,10 @@ export function Timeline() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-4xl text-[rgb(var(--foreground))] mb-4">
-            How It Works
+            How We Work
           </h2>
           <p className="text-xl text-[rgb(var(--foreground),0.7)]">
-            From discovery to deal: Your journey to breakthrough innovation
+            Dynamic timeline: from intro call to deal closed
           </p>
         </motion.div>
 
@@ -127,108 +153,99 @@ export function Timeline() {
           <div
             ref={containerRef}
             onScroll={handleScroll}
-            className="overflow-x-auto pb-8 hide-scrollbar"
+            className="overflow-x-auto pb-10 hide-scrollbar"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
             }}
           >
-            <div className="flex items-start gap-4 md:gap-8 min-w-max px-4 md:px-16 lg:px-20">
+            <div className="flex items-start gap-6 md:gap-10 min-w-max px-4 md:px-16 lg:px-20">
               {steps.map((step, index) => (
                 <motion.div
                   key={index}
-                  className="flex flex-col items-center relative"
+                  className="flex flex-col items-center relative cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   onHoverStart={() => setIsHovered(true)}
                   onHoverEnd={() => setIsHovered(false)}
+                  onClick={() => setExpandedStep((prev) => (prev === index ? null : index))}
                 >
-                  {/* Node */}
+                  {/* Node with icon */}
                   <motion.div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center text-xl transition-all duration-500 relative z-10 ${
+                    className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-500 relative z-10 ${
                       activeStep === index
-                        ? 'bg-[rgb(var(--accent))] text-white shadow-[0_0_30px_rgba(255,107,107,0.6)]'
+                        ? 'bg-[rgb(var(--accent))] text-white shadow-[0_12px_40px_rgba(255,107,107,0.45)]'
                         : 'bg-[rgb(var(--muted))] text-[rgb(var(--foreground))] border-2 border-[rgb(var(--border))]'
                     }`}
-                    whileHover={{ scale: 1.15, y: -2 }}
+                    whileHover={{ scale: 1.08, y: -2 }}
                     animate={{
-                      scale: activeStep === index ? 1.1 : 1,
+                      scale: activeStep === index ? 1.08 : 1,
                       y: activeStep === index ? -4 : 0,
                     }}
                     transition={{ 
-                      type: "spring", 
+                      type: 'spring', 
                       stiffness: 300, 
-                      damping: 20,
+                      damping: 22,
                       duration: 0.3 
                     }}
+                    aria-label={step.title}
                   >
-                    {index + 1}
+                    <step.icon className="w-9 h-9" />
                   </motion.div>
 
-                  {/* Connecting Line */}
-                  {index < steps.length - 1 && (
-                    <div className="absolute left-16 top-8 w-[160px] h-0.5 bg-[rgb(var(--border))]">
-                      <motion.div
-                        className="h-full bg-[rgb(var(--accent))]"
-                        initial={{ width: '0%' }}
-                        whileInView={{ width: '100%' }}
-                        viewport={{ once: true }}
-                        transition={{ 
-                          duration: 0.6, 
-                          delay: index * 0.15,
-                          ease: "easeOut"
-                        }}
-                      />
-                    </div>
-                  )}
-
-                  {/* Content Card */}
+                  {/* Title + Copy */}
                   <motion.div 
-                    className="w-[240px] md:w-[280px] mt-6"
+                    className="w-[260px] md:w-[300px] mt-6 text-center"
                     animate={{
-                      y: activeStep === index ? -8 : 0,
+                      y: activeStep === index ? -6 : 0,
                       scale: activeStep === index ? 1.02 : 1,
                     }}
                     transition={{ 
-                      type: "spring", 
+                      type: 'spring', 
                       stiffness: 300, 
                       damping: 20,
-                      duration: 0.4 
+                      duration: 0.35 
                     }}
                   >
                     <motion.h3 
-                      className="text-lg mb-2"
+                      className="text-lg font-semibold mb-2"
                       animate={{
-                        color: activeStep === index ? '#ff6b6b' : '#0f172a'
+                        color: activeStep === index ? '#ff6b6b' : '#0f172a',
+                        opacity: activeStep === index ? 1 : 0.9,
                       }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.25 }}
                     >
                       {step.title}
                     </motion.h3>
-                    <p className="text-sm text-[rgb(var(--foreground),0.7)] mb-3">
+                    <motion.p 
+                      className="text-sm text-[rgb(var(--foreground),0.75)]"
+                      initial={false}
+                      animate={{ opacity: activeStep === index ? 1 : 0.85 }}
+                      transition={{ duration: 0.3 }}
+                    >
                       {step.description}
-                    </p>
-                    
-                    {/* Expanded detail on active step */}
+                    </motion.p>
+
+                    {/* Progressive disclosure on click */}
                     <motion.div
-                      initial={{ height: 0, opacity: 0 }}
+                      initial={false}
                       animate={{
-                        height: activeStep === index ? 'auto' : 0,
-                        opacity: activeStep === index ? 1 : 0
+                        height: expandedStep === index ? 'auto' : 0,
+                        opacity: expandedStep === index ? 1 : 0,
+                        marginTop: expandedStep === index ? 12 : 0,
                       }}
-                      transition={{ 
-                        duration: 0.4,
-                        ease: "easeInOut"
-                      }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
                       className="overflow-hidden"
                     >
-                      <div className="pt-3 border-t border-[rgb(var(--accent))]">
-                        <p className="text-sm text-[rgb(var(--foreground),0.6)]">
-                          {step.detail}
-                        </p>
-                      </div>
+                      {step.detail && (
+                        <div className="pt-3 border-t border-[rgb(var(--accent))]">
+                          <p className="text-sm text-[rgb(var(--foreground),0.7)]">
+                            {step.detail}
+                          </p>
+                        </div>
+                      )}
                     </motion.div>
                   </motion.div>
                 </motion.div>
@@ -236,15 +253,40 @@ export function Timeline() {
             </div>
           </div>
 
-          {/* Progress Indicator */}
-          <div className="mt-8 flex justify-center">
-            <div className="w-64 h-1 bg-[rgb(var(--muted))] rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-[rgb(var(--accent))]"
-                style={{ width: `${(scrollProgress * 100)}%` }}
-                transition={{ duration: 0.1 }}
-              />
+          {/* Step Progress Bar */}
+          <div className="mt-10 max-w-2xl mx-auto px-6">
+            <div className="flex items-center">
+              {steps.map((_, idx) => (
+                <div key={idx} className="flex items-center flex-1 last:flex-initial">
+                  <motion.div
+                    className="w-2.5 h-2.5 rounded-full"
+                    animate={{
+                      backgroundColor: idx <= activeStep ? 'rgb(255, 107, 107)' : 'rgba(15,23,42,0.15)'
+                    }}
+                    transition={{ duration: 0.25 }}
+                  />
+                  {idx < steps.length - 1 && (
+                    <motion.div
+                      className="h-0.5 mx-2 rounded-full flex-1"
+                      animate={{
+                        backgroundColor: idx < activeStep ? 'rgb(255, 107, 107)' : 'rgba(15,23,42,0.15)'
+                      }}
+                      transition={{ duration: 0.25 }}
+                    />
+                  )}
+                </div>
+              ))}
             </div>
+            {!loop && activeStep === steps.length - 1 && (
+              <div className="text-center mt-4">
+                <button
+                  onClick={() => setActiveStep(0)}
+                  className="text-sm text-[rgb(var(--foreground))] underline hover:text-[rgb(var(--accent))]"
+                >
+                  Restart timeline
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
