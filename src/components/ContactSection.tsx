@@ -120,7 +120,7 @@ export function ContactSection() {
         </div>
 
         <motion.div
-          className="max-w-2xl mx-auto backdrop-blur-xl bg-[rgba(var(--background),0.6)] border border-[rgba(var(--foreground),0.1)] rounded-2xl p-12 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]"
+          className="max-w-2xl mx-auto backdrop-blur-xl bg-[rgba(var(--background),0.6)] border border-[rgba(var(--foreground),0.1)] rounded-2xl p-6 md:p-12 shadow-[0_8px_32px_0_rgba(0,0,0,0.1)]"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -157,6 +157,7 @@ export function ContactSection() {
                   value={formData.name}
                   onChange={handleChange}
                   required
+                  autoComplete="name"
                   className="w-full px-4 py-3 rounded-lg border border-[rgb(var(--border))] bg-[rgba(var(--background),0.5)] text-[rgb(var(--foreground))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] transition-all duration-200 backdrop-blur-sm"
                   placeholder="Your name"
                 />
@@ -173,6 +174,7 @@ export function ContactSection() {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  autoComplete="email"
                   className="w-full px-4 py-3 rounded-lg border border-[rgb(var(--border))] bg-[rgba(var(--background),0.5)] text-[rgb(var(--foreground))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] transition-all duration-200 backdrop-blur-sm"
                   placeholder="your@email.com"
                 />
@@ -188,6 +190,7 @@ export function ContactSection() {
                   name="company"
                   value={formData.company}
                   onChange={handleChange}
+                  autoComplete="organization"
                   className="w-full px-4 py-3 rounded-lg border border-[rgb(var(--border))] bg-[rgba(var(--background),0.5)] text-[rgb(var(--foreground))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] transition-all duration-200 backdrop-blur-sm"
                   placeholder="Your company"
                 />
@@ -204,6 +207,7 @@ export function ContactSection() {
                   onChange={handleChange}
                   required
                   rows={5}
+                  autoComplete="off"
                   className="w-full px-4 py-3 rounded-lg border border-[rgb(var(--border))] bg-[rgba(var(--background),0.5)] text-[rgb(var(--foreground))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent))] transition-all duration-200 resize-none backdrop-blur-sm"
                   placeholder="Tell us about your needs..."
                 />

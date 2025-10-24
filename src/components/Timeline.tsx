@@ -10,39 +10,29 @@ interface TimelineStep {
 
 const steps: TimelineStep[] = [
   {
-    title: 'Initial Call',
-    description: 'We understand your needs and the kind of IP you\'re looking for.',
-    detail: 'Our team schedules a consultation to deeply understand your business challenges and innovation requirements.'
+    title: 'Discovery Call',
+    description: 'We understand your innovation needs and strategic goals.',
+    detail: 'Quick consultation to identify your specific IP requirements and business challenges.'
   },
   {
     title: 'AI Search',
-    description: 'We use the largest patent database and our AI engine trained on patents to scan for breakthroughs.',
-    detail: 'Our proprietary AI analyzes millions of patents to identify the most relevant innovations for your needs.'
+    description: 'Our AI scans 150M+ patents to find breakthrough innovations.',
+    detail: 'Proprietary algorithms analyze millions of patents to identify the most relevant matches for your needs.'
   },
   {
-    title: 'Results Sent',
-    description: 'We deliver the best options. You give feedback. We refine and iterate.',
-    detail: 'Receive curated patent matches with detailed analysis. Your feedback helps us refine the search.'
+    title: 'Curated Results',
+    description: 'We deliver the best options with detailed analysis and feedback.',
+    detail: 'Receive hand-picked patent matches with comprehensive analysis and iterative refinement.'
   },
   {
-    title: 'Golden Patent',
-    description: 'Together we identify the innovation that can give you a competitive edge.',
-    detail: 'Collaborative review process to identify the perfect IP that aligns with your strategic goals.'
+    title: 'Inventor Connection',
+    description: 'Direct introduction to inventors and researchers for technical discussions.',
+    detail: 'We facilitate high-level calls with inventors to explore technical fit and potential applications.'
   },
   {
-    title: 'Inventor Call',
-    description: 'We set up a high-level call with the inventors to explore potential fit.',
-    detail: 'Direct connection with inventors and researchers to discuss technical details and applications.'
-  },
-  {
-    title: 'NDA & Pilot',
-    description: 'If aligned, you sign an NDA, share details, and begin pilot testing.',
-    detail: 'Secure confidential agreements and initiate pilot programs to validate the technology fit.'
-  },
-  {
-    title: 'Deal Signed',
-    description: 'If the pilot succeeds, you finalize the deal. Atom charges inventors a small percentage. For companies, it\'s zero cost.',
-    detail: 'Complete the licensing agreement with full legal support. No fees for companies.'
+    title: 'Deal Execution',
+    description: 'Secure pilot testing and final licensing agreement. Zero cost for companies.',
+    detail: 'Complete the licensing process with full legal support. Atom charges inventors, not companies.'
   }
 ];
 
@@ -57,15 +47,15 @@ export function Timeline() {
     
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % steps.length);
-    }, 5000); // Change every 5 seconds
+    }, 3000); // Change every 3 seconds for faster pace
 
     return () => clearInterval(interval);
   }, [isHovered]);
 
-  // Scroll to center the active step
+  // Scroll to center the active step with smoother animation
   useEffect(() => {
     if (containerRef.current) {
-      const stepWidth = 296; // 280px width + 16px gap
+      const stepWidth = 240; // Updated for smaller cards
       const containerWidth = containerRef.current.clientWidth;
       const scrollPosition = (activeStep * stepWidth) - (containerWidth / 2) + (stepWidth / 2);
       
@@ -143,7 +133,7 @@ export function Timeline() {
               msOverflowStyle: 'none',
             }}
           >
-            <div className="flex items-start gap-8 min-w-max px-16 lg:px-20">
+            <div className="flex items-start gap-4 md:gap-8 min-w-max px-4 md:px-16 lg:px-20">
               {steps.map((step, index) => (
                 <motion.div
                   key={index}
@@ -157,46 +147,81 @@ export function Timeline() {
                 >
                   {/* Node */}
                   <motion.div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center text-xl transition-all duration-300 relative z-10 ${
+                    className={`w-16 h-16 rounded-full flex items-center justify-center text-xl transition-all duration-500 relative z-10 ${
                       activeStep === index
                         ? 'bg-[rgb(var(--accent))] text-white shadow-[0_0_30px_rgba(255,107,107,0.6)]'
                         : 'bg-[rgb(var(--muted))] text-[rgb(var(--foreground))] border-2 border-[rgb(var(--border))]'
                     }`}
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.15, y: -2 }}
+                    animate={{
+                      scale: activeStep === index ? 1.1 : 1,
+                      y: activeStep === index ? -4 : 0,
+                    }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 300, 
+                      damping: 20,
+                      duration: 0.3 
+                    }}
                   >
                     {index + 1}
                   </motion.div>
 
                   {/* Connecting Line */}
                   {index < steps.length - 1 && (
-                    <div className="absolute left-16 top-8 w-[200px] h-0.5 bg-[rgb(var(--border))]">
+                    <div className="absolute left-16 top-8 w-[160px] h-0.5 bg-[rgb(var(--border))]">
                       <motion.div
                         className="h-full bg-[rgb(var(--accent))]"
                         initial={{ width: '0%' }}
                         whileInView={{ width: '100%' }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.8, delay: index * 0.2 }}
+                        transition={{ 
+                          duration: 0.6, 
+                          delay: index * 0.15,
+                          ease: "easeOut"
+                        }}
                       />
                     </div>
                   )}
 
                   {/* Content Card */}
-                  <div className="w-[280px] mt-6">
-                    <h3 className="text-lg mb-2 text-[rgb(var(--foreground))]">
+                  <motion.div 
+                    className="w-[240px] md:w-[280px] mt-6"
+                    animate={{
+                      y: activeStep === index ? -8 : 0,
+                      scale: activeStep === index ? 1.02 : 1,
+                    }}
+                    transition={{ 
+                      type: "spring", 
+                      stiffness: 300, 
+                      damping: 20,
+                      duration: 0.4 
+                    }}
+                  >
+                    <motion.h3 
+                      className="text-lg mb-2"
+                      animate={{
+                        color: activeStep === index ? '#ff6b6b' : '#0f172a'
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
                       {step.title}
-                    </h3>
+                    </motion.h3>
                     <p className="text-sm text-[rgb(var(--foreground),0.7)] mb-3">
                       {step.description}
                     </p>
                     
-                    {/* Expanded detail on hover */}
+                    {/* Expanded detail on active step */}
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{
                         height: activeStep === index ? 'auto' : 0,
                         opacity: activeStep === index ? 1 : 0
                       }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ 
+                        duration: 0.4,
+                        ease: "easeInOut"
+                      }}
                       className="overflow-hidden"
                     >
                       <div className="pt-3 border-t border-[rgb(var(--accent))]">
@@ -205,7 +230,7 @@ export function Timeline() {
                         </p>
                       </div>
                     </motion.div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               ))}
             </div>

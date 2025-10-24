@@ -3,7 +3,11 @@ import { motion } from 'motion/react';
 import { PrimaryButton } from './PrimaryButton';
 import { PatentConstellationHero } from './PatentConstellationHero';
 
-export function Hero() {
+interface HeroProps {
+  onAnimationComplete?: () => void;
+}
+
+export function Hero({ onAnimationComplete }: HeroProps = {}) {
   const [firstLineComplete, setFirstLineComplete] = useState(false);
   const [displayedFirstLine, setDisplayedFirstLine] = useState('');
   const [displayedSecondLine, setDisplayedSecondLine] = useState('');
@@ -13,7 +17,7 @@ export function Hero() {
   const [showNavbar, setShowNavbar] = useState(false);
   
   const firstLine = "In business, you want to be a front runner.";
-  const secondLine = "Not a latecomer.";
+  const secondLine = "Not an also-ran.";
   
   useEffect(() => {
     // Type first line
@@ -40,26 +44,31 @@ export function Hero() {
               setTimeout(() => {
                 setShowSubheader(true);
                 
-                // Show CTA after subheader
-                setTimeout(() => {
-                  setShowCTA(true);
-                  
-                  // Show constellation after CTA
-                  setTimeout(() => {
-                    setShowConstellation(true);
-                    
-                    // Show navbar last
-                    setTimeout(() => {
-                      setShowNavbar(true);
-                      // Dispatch event to trigger navbar animation
-                      window.dispatchEvent(new CustomEvent('show-navbar'));
-                    }, 400);
-                  }, 400);
-                }, 300);
+                        // Show CTA after subheader
+                        setTimeout(() => {
+                          setShowCTA(true);
+                          
+                          // Show navbar immediately after CTA (no delay)
+                          setShowNavbar(true);
+                          // Dispatch event to trigger navbar animation
+                          window.dispatchEvent(new CustomEvent('show-navbar'));
+                          
+                          // Show constellation after CTA with delay
+                          setTimeout(() => {
+                            setShowConstellation(true);
+                            
+                            // Call animation complete callback after constellation starts
+                            if (onAnimationComplete) {
+                              setTimeout(() => {
+                                onAnimationComplete();
+                              }, 1000); // Allow constellation to start
+                            }
+                          }, 400);
+                        }, 300);
               }, 300);
             }
           }, 40);
-        }, 1200); // Longer pause before second line (was 600ms, now 1200ms)
+        }, 800); // Optimized pause for better flow
       }
     }, 40);
     
@@ -80,8 +89,8 @@ export function Hero() {
           {/* Left: Text content */}
           <div className="space-y-6 relative z-20">
             {/* Typewriter headline - BOLD and BIGGER */}
-            <div className="min-h-[220px]">
-              <h1 className="text-5xl lg:text-7xl text-[rgb(var(--foreground))]" style={{ fontWeight: 700, lineHeight: 1.1 }}>
+            <div className="min-h-[180px] md:min-h-[220px]">
+              <h1 className="text-4xl md:text-5xl lg:text-7xl text-[rgb(var(--foreground))]" style={{ fontWeight: 700, lineHeight: 1.1 }}>
                 {displayedFirstLine}
                 {!firstLineComplete && <span className="animate-pulse">|</span>}
                 <br />
@@ -96,12 +105,12 @@ export function Hero() {
 
             {/* Subheader */}
             <motion.p
-              className="text-lg lg:text-xl text-[rgb(var(--foreground),0.8)] max-w-xl"
+              className="text-base md:text-lg lg:text-xl text-[rgb(var(--foreground),0.8)] max-w-xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: showSubheader ? 1 : 0, y: showSubheader ? 0 : 20 }}
               transition={{ duration: 0.6 }}
             >
-              We help connect companies with breakthrough innovations through our AI-powered patent discovery system.
+              We connect companies with breakthrough innovations through our AI-powered patent discovery system.
             </motion.p>
 
             {/* CTA */}
@@ -130,7 +139,7 @@ export function Hero() {
         </div>
         
         {/* Mobile constellation - below the fold */}
-        <div className="lg:hidden mt-16 relative" style={{ height: '500px' }}>
+        <div className="lg:hidden mt-16 relative" style={{ height: '400px' }}>
           <motion.div
             className="absolute inset-0"
             initial={{ opacity: 0 }}

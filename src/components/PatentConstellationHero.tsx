@@ -77,10 +77,10 @@ export function PatentConstellationHero() {
       setIsGraphVisible(true);
     }, 1000);
 
-    // Allow spotlight to start after 2 seconds total (1s for graph + 1s delay)
+    // Allow spotlight to start after 1.5 seconds total (1s for graph + 0.5s delay)
     const spotlightTimer = setTimeout(() => {
       setCanStartSpotlight(true);
-    }, 2000);
+    }, 1500);
 
     return () => {
       clearTimeout(graphTimer);
@@ -120,7 +120,7 @@ export function PatentConstellationHero() {
     // Single cluster centered in the canvas (like a brain)
     const centerX = width / 2;
     const centerY = height / 2;
-    const nodeCount = isMobile ? 15 : 25; // Reduced from 40 total to 25 for performance
+    const nodeCount = isMobile ? 12 : 20; // Further optimized for performance
 
     let nodeId = 0;
 
@@ -146,7 +146,7 @@ export function PatentConstellationHero() {
 
     // Create edges within the cluster
     nodes.forEach((node, i) => {
-      const connectionCount = 2 + Math.floor(Math.random() * 2); // 2-3 connections per node
+      const connectionCount = 1 + Math.floor(Math.random() * 2); // 1-2 connections per node for better performance
       
       for (let j = 0; j < Math.min(connectionCount, nodes.length - 1); j++) {
         const otherNodes = nodes.filter(n => n.id !== node.id);
@@ -173,22 +173,22 @@ export function PatentConstellationHero() {
   ) => {
     ctx.save();
     
-    // Position card at top of constellation area
-    const cardTopY = 40; // More space from top
-    const cardHeight = 70;
+        // Position card further down to avoid navbar
+        const cardTopY = 128; // Positioned to connect with line (top-32 = 128px)
+    const cardHeight = 60;
     const cardBottomY = cardTopY + cardHeight;
     
-    // Only draw line if node is in upper portion and line would be visible
-    if (nodeY < height * 0.4) {
-      ctx.strokeStyle = `rgba(255, 107, 107, ${progress * 0.5})`;
-      ctx.lineWidth = 2;
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(nodeX, nodeY);
-      ctx.lineTo(nodeX, Math.min(nodeY + 100, cardBottomY));
-      ctx.stroke();
-      ctx.setLineDash([]);
-    }
+    // Always draw line when there's a spotlight or hover, regardless of node position
+    // Use full opacity for better visibility
+    const lineOpacity = Math.max(0.7, progress); // Minimum 70% opacity, full when progress is 1
+    ctx.strokeStyle = `rgba(255, 107, 107, ${lineOpacity})`;
+    ctx.lineWidth = 1.5; // Thinner line as requested
+    ctx.setLineDash([6, 4]); // More prominent dashed line
+    ctx.beginPath();
+    ctx.moveTo(nodeX, nodeY);
+    ctx.lineTo(nodeX, cardTopY); // Connect directly to the top of the card
+    ctx.stroke();
+    ctx.setLineDash([]);
     
     ctx.restore();
   };
@@ -208,7 +208,7 @@ export function PatentConstellationHero() {
     // Camera orbit (unless reduced motion or mobile)
     const isMobile = width < 768;
     if (!prefersReducedMotion && !isMobile) {
-      orbitAngle.current = (timestamp / 20000) * (Math.PI / 30); // 2-3 degrees over 20s
+      orbitAngle.current = (timestamp / 30000) * (Math.PI / 30); // Slower orbit for better performance
     }
 
     const cos = Math.cos(orbitAngle.current);
@@ -347,12 +347,10 @@ export function PatentConstellationHero() {
       
       ctx.restore();
 
-      // Draw connector line for spotlight
-      if (isSpotlight && spotlightState.progress > 0 && !prefersReducedMotion) {
-        drawConnectorLine(ctx, x, y, spotlightState.progress, width, height);
-      }
-      if (isHovered) {
-        drawConnectorLine(ctx, x, y, 1, width, height);
+      // Draw connector line for spotlight and hover - always visible
+      if ((isSpotlight && spotlightState.progress > 0) || isHovered) {
+        const lineProgress = isHovered ? 1 : spotlightState.progress;
+        drawConnectorLine(ctx, x, y, lineProgress, width, height);
       }
     });
 
@@ -402,7 +400,9 @@ export function PatentConstellationHero() {
         return;
       }
 
-      const visibleNodes = nodesRef.current.filter(n => n.x > 0 && n.x < (canvasRef.current?.offsetWidth || 0));
+      // Use all nodes for spotlight selection
+      const visibleNodes = nodesRef.current;
+      
       if (visibleNodes.length === 0) {
         timeoutId = window.setTimeout(runSpotlight, 100);
         return;
@@ -424,7 +424,7 @@ export function PatentConstellationHero() {
         if (progress < 1) {
           animationId = requestAnimationFrame(animateIn);
         } else {
-          // Hold for 3s then animate out
+          // Hold for 2s then animate out
           timeoutId = window.setTimeout(() => {
             let startTimeOut: number | null = null;
             const animateOut = (timestamp: number) => {
@@ -439,12 +439,12 @@ export function PatentConstellationHero() {
               } else {
                 setSpotlightState({ nodeId: null, progress: 0 });
                 setDisplayTitle('');
-                // Immediately trigger next spotlight
-                timeoutId = window.setTimeout(runSpotlight, 100);
+                // Wait before next spotlight
+                timeoutId = window.setTimeout(runSpotlight, 1000);
               }
             };
             animationId = requestAnimationFrame(animateOut);
-          }, 3000);
+          }, 2000);
         }
       };
       animationId = requestAnimationFrame(animateIn);
@@ -548,7 +548,8 @@ export function PatentConstellationHero() {
     };
   }, [animate, initializeNodes]);
 
-  const isVisible = (hoveredNode !== null || spotlightState.progress > 0) && displayTitle;
+  // Clean visibility calculation
+  const isVisible = (hoveredNode !== null || spotlightState.progress > 0) && displayTitle && displayTitle.length > 0;
   const opacity = hoveredNode !== null ? 1 : spotlightState.progress;
 
   return (
@@ -562,18 +563,20 @@ export function PatentConstellationHero() {
         onMouseLeave={handleMouseLeave}
       />
 
-      {/* Patent title display - positioned closer and prevents cutoff */}
-      <div 
-        className="absolute top-6 left-4 right-4 flex items-center justify-center pointer-events-none transition-opacity duration-300 z-10 px-4"
-        style={{ opacity: isVisible ? opacity : 0 }}
-      >
-        <div className="px-4 py-3 rounded-lg shadow-lg border max-w-lg bg-white border-[rgba(15,23,42,0.1)] text-[rgb(15,23,42)]">
-          <p className="text-sm leading-relaxed">{displayTitle}</p>
-          {hoveredNode !== null && (
-            <p className="text-xs text-[rgb(255,107,107)] mt-1">View details</p>
-          )}
+      {/* Patent title display - positioned to connect with line */}
+      {displayTitle && (
+        <div 
+          className="absolute top-32 left-4 right-4 flex items-center justify-center pointer-events-none transition-opacity duration-300 z-10 px-4"
+          style={{ opacity: isVisible ? opacity : 0 }}
+        >
+          <div className="px-4 py-3 rounded-lg shadow-lg backdrop-blur-xl bg-white/90 border border-white/20 text-[rgb(15,23,42)] max-w-lg">
+            <p className="text-sm leading-relaxed font-medium">{displayTitle}</p>
+            {hoveredNode !== null && (
+              <p className="text-xs text-[rgb(255,107,107)] mt-1">View details</p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

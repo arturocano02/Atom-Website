@@ -9,7 +9,7 @@ export function StatsBand() {
   ];
 
   return (
-    <section className="bg-[rgb(var(--foreground))] dark:bg-black py-20">
+    <section id="stats" className="bg-[rgb(var(--foreground))] dark:bg-black py-20">
       <div className="max-w-[1440px] mx-auto px-8">
         <div className="grid md:grid-cols-3 gap-12">
           {stats.map((stat, index) => (
